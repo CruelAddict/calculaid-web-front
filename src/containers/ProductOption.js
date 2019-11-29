@@ -15,7 +15,8 @@ const mapDispatchToProps = dispatch => ({
     addQueuedMessage: messageObject => dispatch(Actions.addQueuedMessage(messageObject)),
     releaseQueuedItem: () => dispatch(Actions.releaseQueuedItem()),
     displayMealInfo: mealInfo => dispatch(Actions.displayMealInfo(mealInfo)),
-    handleLastDisplayedMessage: () => dispatch(Actions.handleLastDisplayedMessage())
+    handleLastDisplayedMessage: () => dispatch(Actions.handleLastDisplayedMessage()),
+    reportMatchFailure: () => dispatch(Actions.reportMatchFailure())
 });
 
 
@@ -43,19 +44,23 @@ class ProductOption extends React.Component {
         if ((this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].type === messageTypes.userInput) && this.props.main) {
             if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 2].expectedNext === messageTypes.userProductClarification) {
                 if (!this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].handled) {
-                    if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].text === this.props.text) {
+                    if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].text.toLowerCase() === this.props.text.toLowerCase()) {
                         this.props.handleLastDisplayedMessage().then(() => {
                             console.log(this.props.displayedMessages.items);
                             this.chooseItem();
                         })
-                    }
+                    } else this.props.reportMatchFailure()
                 }
             }
         }
     }
 
     render() {
-        return <span style={{display: 'block'}} onClick={this.chooseItem}>{this.props.text}</span>
+        let clickableClass = this.props.main ? 'clickable' : 'not-clickable';
+        return <div className={'product-item-container '+clickableClass}
+                    onClick={this.props.main ? this.chooseItem : null}>
+            <p style={{display: 'block'}} >{this.props.text}</p>
+        </div>
     }
 }
 

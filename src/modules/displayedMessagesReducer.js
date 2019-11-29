@@ -75,6 +75,15 @@ export default (state = {items: [], queuedItems: []}, action) => {
                 ]
             };
 
+        case Actions.Types.REPLAY_MESSAGE:
+            return {
+                ...state,
+                items: [
+                    ...state.items,
+                    state.items[state.items.length-2]
+                ]
+            };
+
         default:
             return state;
     }

@@ -6,7 +6,10 @@ const Types = {
     RELEASE_QUEUED_MESSAGE: "RELEASE_QUEUED_MESSAGE",
     DISPLAY_MEAL_INFO: "DISPLAY_MEAL_INFO",
     ADD_USER_RESPONSE: "ADD_USER_RESPONSE",
-    HANDLE_LAST_DISPLAYED_MESSAGE: "HANDLE_LAST_DISPLAYED_MESSAGE"
+    HANDLE_LAST_DISPLAYED_MESSAGE: "HANDLE_LAST_DISPLAYED_MESSAGE",
+    REPORT_FAILURE: "REPORT_FAILURE",
+    DROP_FAILED_COUNT: "DROP_FAILED_COUNT",
+    REPLAY_MESSAGE: "REPLAY_MESSAGE"
 };
 
 const addResponse = response => dispatch => {
@@ -72,6 +75,24 @@ const handleLastDisplayedMessage = () => dispatch => {
     return Promise.resolve()
 };
 
+const reportMatchFailure = () => dispatch => {
+    dispatch({
+        type: Types.REPORT_FAILURE
+    })
+};
+
+const dropFailedCount = () => dispatch => {
+    dispatch({
+        type: Types.DROP_FAILED_COUNT
+    })
+};
+
+const replayMessage = () => dispatch => {
+    dispatch({
+        type: Types.REPLAY_MESSAGE
+    })
+};
+
 export default {
     addResponse,
     chooseItem,
@@ -81,5 +102,8 @@ export default {
     displayMealInfo,
     addUserResponse,
     handleLastDisplayedMessage,
+    reportMatchFailure,
+    dropFailedCount,
+    replayMessage,
     Types
 }

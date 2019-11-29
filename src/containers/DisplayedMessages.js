@@ -27,6 +27,12 @@ class DisplayedMessages extends React.Component {
         super();
     }
 
+    componentDidUpdate() {
+        window.document.getElementById('dialog-messages').scrollIntoView(false);
+        // console.log(this.props.recognizing);
+        // !this.props.recognizing && this.props.recognizer.start();
+    }
+
     render() {
         // console.log('displayed: ');
         // console.log(this.props.displayedMessages.items);
@@ -48,8 +54,10 @@ class DisplayedMessages extends React.Component {
             }
             }
         );
-        return <div>
-            {messages}
+        return <div className={'dialog-messages-wrapper'}>
+            <div id={'dialog-messages'}>
+                {messages}
+            </div>
         </div>
     }
 }

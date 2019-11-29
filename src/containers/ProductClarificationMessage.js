@@ -5,7 +5,8 @@ import ProductOption from "./ProductOption";
 
 const mapStateToProps = state => ({
     responseMessages: state.responseMessages,
-    displayedMessages: state.displayedMessages
+    displayedMessages: state.displayedMessages,
+    failedItemsCount: state.failedItemsCount
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -14,7 +15,9 @@ const mapDispatchToProps = dispatch => ({
     addDisplayedMessage: messageObject => dispatch(Actions.addDisplayedMessage(messageObject)),
     addQueuedMessage: messageObject => dispatch(Actions.addQueuedMessage(messageObject)),
     releaseQueuedItem: () => dispatch(Actions.releaseQueuedItem()),
-    displayMealInfo: mealInfo => dispatch(Actions.displayMealInfo(mealInfo))
+    displayMealInfo: mealInfo => dispatch(Actions.displayMealInfo(mealInfo)),
+    dropFailedCount: () => dispatch(Actions.dropFailedCount()),
+    replayMessage: () => dispatch(Actions.replayMessage())
 });
 
 
@@ -37,17 +40,29 @@ class ProductClarificationMessage extends React.Component {
         );
     }
 
+    componentDidUpdate () {
+        console.log(this.props.failedItemsCount);
+        if((this.props.failedItemsCount === this.props.message.rawResponse.products.length) && this.props.main) {
+            this.props.dropFailedCount();
+            this.props.replayMessage();
+        }
+    }
+
     render() {
-        return <div>
+        let mainClass = this.props.main ? ' main' : '';
+        return <div className={mainClass}>
             <span>Нам необходимо кое-что уточнить. Что конкретно вы съели?</span>
-            {this.props.message.rawResponse.products.map(product => (
-                <ProductOption
-                    text={product.name}
-                    key={product.id}
-                    productId={product.id}
-                    vagueProductIndex={this.props.message.vagueProductIndex}
-                    main={this.props.main}
-                />))}
+            <div className={'options-container'} >
+                {this.props.message.rawResponse.products.map(product => (
+                    <ProductOption
+                        text={product.name}
+                        key={product.id}
+                        productId={product.id}
+                        vagueProductIndex={this.props.message.vagueProductIndex}
+                        main={this.props.main}
+                    />))}
+            </div>
+
         </div>
     }
 }

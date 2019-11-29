@@ -10,7 +10,8 @@ const initialState = {
     displayedMessages: {
         items: [],
         queuedItems: []
-    }
+    },
+    failedItemsCount: 0
 };
 
 const configureStore = () => {

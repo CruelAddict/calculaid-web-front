@@ -18,9 +18,10 @@ const mapDispatchToProps = dispatch => ({
 class MealInfo extends React.Component {
 
     render() {
+        let mainClass = this.props.main ? ' main' : '';
         console.log(this.props.message.mealInfo.items.map(item => (item.products[0])));
         // console.log(this.props.message.mealInfo);
-        return <span>{`Вы съели ${this.props.message.mealInfo.items.map(item => (item.products[0].name)).join(' и ')}`}</span>
+        return <span className={mainClass}>{`Вы съели ${this.props.message.mealInfo.items.map(item => (item.products[0].name)).join(' и ')}`}</span>
     }
 }
 

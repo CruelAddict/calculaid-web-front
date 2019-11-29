@@ -17,7 +17,10 @@ const mapDispatchToProps = dispatch => ({
 
 class SpanMessage extends React.Component {
     render() {
-        return <span style={{display: 'block'}}>{this.props.message.text}</span>
+        let mainClass = this.props.main ? ' main' : '';
+        return <div className={mainClass}>
+            <p style={{display: 'block'}}>{this.props.message.text}</p>
+        </div>
     }
 }
 
