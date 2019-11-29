@@ -9,7 +9,9 @@ const Types = {
     HANDLE_LAST_DISPLAYED_MESSAGE: "HANDLE_LAST_DISPLAYED_MESSAGE",
     REPORT_FAILURE: "REPORT_FAILURE",
     DROP_FAILED_COUNT: "DROP_FAILED_COUNT",
-    REPLAY_MESSAGE: "REPLAY_MESSAGE"
+    REPLAY_MESSAGE: "REPLAY_MESSAGE",
+    VOICE_RECOGNITION_DISABLED: "VOICE_RECOGNITION_DISABLED",
+    VOICE_RECOGNITION_ENABLED: "VOICE_RECOGNITION_ENABLED"
 };
 
 const addResponse = response => dispatch => {
@@ -93,6 +95,20 @@ const replayMessage = () => dispatch => {
     })
 };
 
+const enableVoiceRecognition = () => dispatch => {
+    dispatch({
+        type: Types.VOICE_RECOGNITION_ENABLED
+    });
+    return Promise.resolve()
+};
+
+const disableVoiceRecognition = () => dispatch => {
+    dispatch({
+        type: Types.VOICE_RECOGNITION_DISABLED
+    });
+    return Promise.resolve()
+};
+
 export default {
     addResponse,
     chooseItem,
@@ -105,5 +121,7 @@ export default {
     reportMatchFailure,
     dropFailedCount,
     replayMessage,
+    enableVoiceRecognition,
+    disableVoiceRecognition,
     Types
 }

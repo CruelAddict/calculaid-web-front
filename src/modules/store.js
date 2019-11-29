@@ -11,7 +11,8 @@ const initialState = {
         items: [],
         queuedItems: []
     },
-    failedItemsCount: 0
+    failedItemsCount: 0,
+    recognizing: false
 };
 
 const configureStore = () => {

@@ -44,7 +44,7 @@ class ProductOption extends React.Component {
         if ((this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].type === messageTypes.userInput) && this.props.main) {
             if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 2].expectedNext === messageTypes.userProductClarification) {
                 if (!this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].handled) {
-                    if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].text.toLowerCase() === this.props.text.toLowerCase()) {
+                    if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].text.toLowerCase() === this.props.text.toLowerCase().replace(/[^A-Za-zА-Яа-яЁё\s]/g, '')) {
                         this.props.handleLastDisplayedMessage().then(() => {
                             console.log(this.props.displayedMessages.items);
                             this.chooseItem();

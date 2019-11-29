@@ -9,7 +9,8 @@ import UserInput from './UserInput'
 
 
 const mapStateToProps = state => ({
-    displayedMessages: state.displayedMessages
+    displayedMessages: state.displayedMessages,
+    recognizing: state.recognizing
 });
 
 const mapDispatchToProps = dispatch => ({

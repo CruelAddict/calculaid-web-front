@@ -14,9 +14,28 @@ body {
 #dialog {
   display: block;
   margin: 0 auto;
-  grid-row: 3/8;
+  grid-row: 1/9;
   grid-column: 3/8;
   overflow-y: hidden;
+}
+
+.speech-recognition-button {
+  grid-row: 9/10;
+  grid-column: 5/7;
+  width: 40px;
+  height: 40px;
+  margin: 40px auto;
+  border-radius: 40px;
+}
+
+.active {
+  background-color: red;
+  color: white;
+}
+
+.disabled {
+  background-color: #969696;
+  color: black;
 }
 
 .dialog-content {
@@ -68,8 +87,11 @@ body {
 }
 
 .product-item-container {
-  height: 15mm;
-  width: 25mm;
+  height: auto;
+  width: 47mm;
+  padding: 4px;
+  margin: 5px;
+  border: 1px solid #969696;
   border-radius: 20px;
   * {
     display: block;
@@ -77,6 +99,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 .clickable {

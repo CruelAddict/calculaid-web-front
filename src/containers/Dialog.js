@@ -8,7 +8,8 @@ import DialogComponent from "../components/DialogComponent";
 
 const mapStateToProps = state => ({
     responseMessages: state.responseMessages,
-    displayedMessages: state.displayedMessages
+    displayedMessages: state.displayedMessages,
+    recognizing: state.recognizing
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -18,9 +19,29 @@ const mapDispatchToProps = dispatch => ({
     addQueuedMessage: messageObject => dispatch(Actions.addQueuedMessage(messageObject)),
     releaseQueuedItem: () => dispatch(Actions.releaseQueuedItem()),
     addUserResponse: response => dispatch(Actions.addUserResponse(response)),
-    handleLastDisplayedMessage: () => dispatch(Actions.handleLastDisplayedMessage())
+    handleLastDisplayedMessage: () => dispatch(Actions.handleLastDisplayedMessage()),
+    enableVoiceRecognition: ()=> dispatch(Actions.enableVoiceRecognition()),
+    disableVoiceRecognition: () => dispatch(Actions.disableVoiceRecognition())
 
 });
+
+function postData(url = '', data = {}) {
+    return fetch(url, {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, cors, *same-origin
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: 'same-origin', // include, *same-origin, omit
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: 'follow', // manual, *follow, error
+        referrer: 'no-referrer', // no-referrer, *client
+        body: JSON.stringify(data), // тип данных в body должен соответвовать значению заголовка "Content-Type"
+    })
+        .then(response => response.json()); // парсит JSON ответ в Javascript объект
+}
+
 
 const fakeResponse = {
     items: [
@@ -65,8 +86,7 @@ class Dialog extends React.Component {
         this.recognizer = new window.webkitSpeechRecognition();
         this.recognizer.interimResults = true;
         this.recognizer.lang = 'ru-Ru';
-        this.recognizing = false;
-        this.shouldStoRecognition = false;
+        this.shouldStopRecognition = false;
     }
 
     componentDidMount() {
@@ -90,19 +110,19 @@ class Dialog extends React.Component {
                 }
             };
             this.recognizer.onstart = () => {
-                this.recognizing = true;
+                this.props.enableVoiceRecognition();
             };
             this.recognizer.onend = () => {
-                this.recognizing = false;
+                this.props.disableVoiceRecognition()
                 let speech = this.state.userSpeech;
                 this.setState({
                     userSpeech: ''
                 });
                 speech !== '' && this.props.addUserResponse(speech);
-                this.shouldStoRecognition = speech === '';
+                this.shouldStopRecognition = speech === '';
             };
             this.recognizer.onerror = () => {
-                console.log('smth went wrong')
+                this.shouldStopRecognition = true;
             }
         });
 
@@ -136,13 +156,14 @@ class Dialog extends React.Component {
     }
 
     startRecognition() {
-        if(!this.recognizing && !this.shouldStoRecognition) {
+        if(!this.props.recognizing && !this.shouldStopRecognition) {
             console.log('starting');
-            this.recognizing = true;
-            this.recognizer.start();
+            this.props.enableVoiceRecognition().then(() => {
+                this.recognizer.start();
+            });
         }
-        if(this.shouldStoRecognition) {
-            this.shouldStoRecognition = false;
+        if(this.shouldStopRecognition) {
+            this.shouldStopRecognition = false;
         }
     }
 
@@ -154,7 +175,7 @@ class Dialog extends React.Component {
 
     componentDidUpdate() {
         if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].type === messageTypes.mealInfo) {
-            this.shouldStoRecognition = true;
+            this.shouldStopRecognition = true;
         }
 
         if(this.props.displayedMessages.items.length !== 0) {
@@ -177,9 +198,12 @@ class Dialog extends React.Component {
         });
         // console.log(this.props.displayedMessages.items);
         // console.log('calling api!');
-        setTimeout(userInput => {
-            this.addResponse(fakeResponse)
-        }, 500)
+        postData('http://172.20.10.3:3001/api/products', {speech: userInput})
+            .then(data => this.addResponse({items: data.data})) // JSON-строка полученная после вызова `response.json()`
+            .catch(error => console.error(error));
+        // setTimeout(userInput => {
+        //     this.addResponse(fakeResponse)
+        // }, 500)
     }
 
     render() {
@@ -189,7 +213,6 @@ class Dialog extends React.Component {
             sendSpeech={this.sendSpeech}
             updateInputValue={this.updateInputValue}
             recognizer={this.recognizer}
-            recognizing={this.recognizing}
         />
     }
 }
