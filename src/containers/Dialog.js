@@ -1,15 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux'
 import Actions from "../modules/actions";
-import DisplayedMessages from '../containers/DisplayedMessages'
-import ProductOption from '../containers/ProductOption'
 import messageTypes from '../modules/messageTypes'
 import DialogComponent from "../components/DialogComponent";
 
 const mapStateToProps = state => ({
     responseMessages: state.responseMessages,
     displayedMessages: state.displayedMessages,
-    recognizing: state.recognizing
+    recognition: state.voiceRecognition
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -21,56 +19,30 @@ const mapDispatchToProps = dispatch => ({
     addUserResponse: response => dispatch(Actions.addUserResponse(response)),
     handleLastDisplayedMessage: () => dispatch(Actions.handleLastDisplayedMessage()),
     enableVoiceRecognition: ()=> dispatch(Actions.enableVoiceRecognition()),
-    disableVoiceRecognition: () => dispatch(Actions.disableVoiceRecognition())
+    disableVoiceRecognition: () => dispatch(Actions.disableVoiceRecognition()),
+    recognitionForceStart: () => dispatch(Actions.recognitionForceStart()),
+    recognitionForceStop: () => dispatch(Actions.recognitionForceStop())
 
 });
 
 function postData(url = '', data = {}) {
     return fetch(url, {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, cors, *same-origin
-        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        credentials: 'same-origin', // include, *same-origin, omit
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
         headers: {
-            'Content-Type': 'application/json',
+            // 'Content-Type': 'application/json',
+            // 'Content-Type': 'text/plain'
             // 'Content-Type': 'application/x-www-form-urlencoded',
         },
-        redirect: 'follow', // manual, *follow, error
-        referrer: 'no-referrer', // no-referrer, *client
-        body: JSON.stringify(data), // тип данных в body должен соответвовать значению заголовка "Content-Type"
+        redirect: 'follow',
+        referrer: 'no-referrer',
+        // body: JSON.stringify(data),
+        body: data
     })
-        .then(response => response.json()); // парсит JSON ответ в Javascript объект
+        .then(response => response.json());
 }
-
-
-const fakeResponse = {
-    items: [
-        {
-            products: [
-                {
-                    name: 'тыква',
-                    id: 1
-                },
-                {
-                    name: 'картошка',
-                    id: 2
-                }
-            ]
-        },
-        {
-            products: [
-                {
-                    name: 'гамбургер',
-                    id: 3
-                },
-                {
-                    name: 'кола',
-                    id: 4
-                }
-            ]
-        }
-    ]
-};
 
 class Dialog extends React.Component {
 
@@ -86,7 +58,6 @@ class Dialog extends React.Component {
         this.recognizer = new window.webkitSpeechRecognition();
         this.recognizer.interimResults = true;
         this.recognizer.lang = 'ru-Ru';
-        this.shouldStopRecognition = false;
     }
 
     componentDidMount() {
@@ -110,19 +81,20 @@ class Dialog extends React.Component {
                 }
             };
             this.recognizer.onstart = () => {
+                // console.log('starting vr');
                 this.props.enableVoiceRecognition();
             };
             this.recognizer.onend = () => {
-                this.props.disableVoiceRecognition()
+                this.props.disableVoiceRecognition();
                 let speech = this.state.userSpeech;
                 this.setState({
                     userSpeech: ''
                 });
                 speech !== '' && this.props.addUserResponse(speech);
-                this.shouldStopRecognition = speech === '';
+                speech === '' && !this.props.recognition.forceStopped && this.props.recognitionForceStop().then(this.recognizer.abort)
             };
             this.recognizer.onerror = () => {
-                this.shouldStopRecognition = true;
+                !this.props.recognition.forceStopped && this.props.recognitionForceStop().then(this.recognizer.abort)
             }
         });
 
@@ -134,15 +106,23 @@ class Dialog extends React.Component {
     }
 
     addResponse(response) {
+        // console.log(response);
         this.props.addResponse(response).then(() => {
-            this.props.responseMessages.items[this.props.responseMessages.items.length - 1].items.map(
+            response.items.map(item => (item.products.length === 0 ? 'zero' : 'non-zero')).includes('non-zero') ?  // TODO: replace with if 500
+                this.props.responseMessages.items[this.props.responseMessages.items.length - 1].items.map(
                 (item, index) => {
                     index === 0 ?
                         !item.resolved && this.props.addDisplayedMessage(this.parseResponse(item, index))
                         :
                         !item.resolved && this.props.addQueuedMessage(this.parseResponse(item, index))
                 }
-            )
+            ) :
+                this.props.addDisplayedMessage({
+                    type: messageTypes.simpleMessage,
+                    text: 'Не очень понятно. Повторите, пожалуйста, еще раз.',
+                    expectedNext: messageTypes.userMealInfo,
+                    handled: false
+                })
         })
     }
 
@@ -156,14 +136,11 @@ class Dialog extends React.Component {
     }
 
     startRecognition() {
-        if(!this.props.recognizing && !this.shouldStopRecognition) {
-            console.log('starting');
+        if(!this.props.recognition.recognizing && !this.props.recognition.forceStopped) {
             this.props.enableVoiceRecognition().then(() => {
+                // console.log('starting');
                 this.recognizer.start();
             });
-        }
-        if(this.shouldStopRecognition) {
-            this.shouldStopRecognition = false;
         }
     }
 
@@ -175,7 +152,11 @@ class Dialog extends React.Component {
 
     componentDidUpdate() {
         if (this.props.displayedMessages.items[this.props.displayedMessages.items.length - 1].type === messageTypes.mealInfo) {
-            this.shouldStopRecognition = true;
+            this.props.recognition.recognizing && this.props.recognitionForceStop().then(
+                () => {
+                    this.recognizer.abort();
+                }
+            )
         }
 
         if(this.props.displayedMessages.items.length !== 0) {
@@ -198,7 +179,11 @@ class Dialog extends React.Component {
         });
         // console.log(this.props.displayedMessages.items);
         // console.log('calling api!');
-        postData('http://172.20.10.3:3001/api/products', {speech: userInput})
+        // console.log(`{"speech":"${userInput}"}`);
+        postData('http://194.87.101.20:3000/api/products',
+            `{"speech":"${userInput}"}`
+            // {speech: userInput}
+            )
             .then(data => this.addResponse({items: data.data})) // JSON-строка полученная после вызова `response.json()`
             .catch(error => console.error(error));
         // setTimeout(userInput => {
@@ -207,7 +192,7 @@ class Dialog extends React.Component {
     }
 
     render() {
-        // console.log(this.props.displayedMessages.items);
+        console.log(this.props.responseMessages);
         return <DialogComponent
             state={this.state}
             sendSpeech={this.sendSpeech}

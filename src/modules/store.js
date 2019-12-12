@@ -12,7 +12,10 @@ const initialState = {
         queuedItems: []
     },
     failedItemsCount: 0,
-    recognizing: false
+    voiceRecognition: {
+        recognizing: false,
+        forceStopped: false
+    }
 };
 
 const configureStore = () => {

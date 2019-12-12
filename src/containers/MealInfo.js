@@ -17,11 +17,19 @@ const mapDispatchToProps = dispatch => ({
 
 class MealInfo extends React.Component {
 
+    calculateBreadUnits(products) {
+        let breadUnits = 0;
+        console.log(products);
+        for (let product of products) {
+            breadUnits+= (1 * product.product.measure.grams) / 100 * product.product.pfc.c
+        }
+        return breadUnits;
+    }
+
     render() {
         let mainClass = this.props.main ? ' main' : '';
-        console.log(this.props.message.mealInfo.items.map(item => (item.products[0])));
-        // console.log(this.props.message.mealInfo);
-        return <span className={mainClass}>{`Вы съели ${this.props.message.mealInfo.items.map(item => (item.products[0].name)).join(' и ')}`}</span>
+        return <span className={mainClass}>{`Вы съели ${this.props.message.mealInfo.items.map(item => (`${item.product.name}, ${item.product.measure.name}`)).join(' и ')}.
+        Это ${this.calculateBreadUnits(this.props.message.mealInfo.items)} хлебных единиц`}</span>
     }
 }
 

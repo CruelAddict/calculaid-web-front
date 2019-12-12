@@ -11,6 +11,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     addResponse: response => dispatch(Actions.addResponse(response)),
     chooseItem: (parsedItemIndex, id) => dispatch(Actions.chooseItem(parsedItemIndex, id)),
+    chooseMeasure: (parsedItemIndex, id) => dispatch(Actions.chooseMeasure(parsedItemIndex, id)),
     addDisplayedMessage: messageObject => dispatch(Actions.addDisplayedMessage(messageObject)),
     addQueuedMessage: messageObject => dispatch(Actions.addQueuedMessage(messageObject)),
     releaseQueuedItem: () => dispatch(Actions.releaseQueuedItem()),
@@ -20,7 +21,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 
-class ProductOption extends React.Component {
+class MeasureOption extends React.Component {
 
     constructor() {
         super();
@@ -28,31 +29,15 @@ class ProductOption extends React.Component {
     }
 
     chooseItem() {
-        // console.log(this.props);
-        this.props.chooseItem(this.props.vagueProductIndex, this.props.productId).then(
+        this.props.chooseMeasure(this.props.vagueProductIndex, this.props.measureId).then(
             () => {
-                if (this.props.responseMessages.items.filter(             // there is something to choose between
-                    responseMessage => responseMessage['actual']
-                )[0].items[this.props.vagueProductIndex].product.measures.length !== 1
-                // &&
-                // this.props.responseMessages.items.filter(             // there is no special amount specified
-                //     responseMessage => responseMessage['actual']
-                // )[0].items[this.props.vagueProductIndex].products[0].measure === undefined
-                ) {
-                    this.props.addDisplayedMessage({
-                        type: messageTypes.measureClarification,
-                        expectedNext: messageTypes.userMeasureClarification,
-                        rawResponse: this.props.rawResponse,
-                        vagueProductIndex: this.props.vagueProductIndex,
-                        handled: false
-                    })
-                } else if (this.props.displayedMessages.queuedItems.length !== 0) {  // more queued messages
+                if (this.props.displayedMessages.queuedItems.length !== 0) {  // no more queued messages
+                    console.log('releasing queue!');
                     this.props.releaseQueuedItem();
                 } else {
-                    this.props.displayMealInfo(this.props.responseMessages.items.filter(
-                        responseMessage => responseMessage['actual'])[0])
+                        this.props.displayMealInfo(this.props.responseMessages.items.filter(
+                            responseMessage => responseMessage['actual'])[0])
                 }
-
             }
         );
     }
@@ -75,11 +60,11 @@ class ProductOption extends React.Component {
 
     render() {
         let clickableClass = this.props.main ? 'clickable' : 'not-clickable';
-        return <div className={'product-item-container ' + clickableClass}
+        return <div className={'product-item-container '+clickableClass}
                     onClick={this.props.main ? this.chooseItem : null}>
-            <p style={{display: 'block'}}>{this.props.text}</p>
+            <p style={{display: 'block'}} >{this.props.text}</p>
         </div>
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductOption)
+export default connect(mapStateToProps, mapDispatchToProps)(MeasureOption)

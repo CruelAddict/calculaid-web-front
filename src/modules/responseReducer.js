@@ -30,15 +30,45 @@ export default (state = {items: []}, action) => {
                                 (parsedProduct, index) => (
                                                 {
                                                     ...parsedProduct,
-                                                    products: index === action.payload.parsedProductIndex ?
+                                                    product: index === action.payload.parsedProductIndex ?
                                                         parsedProduct['products'].filter(possibleProduct =>
                                                             possibleProduct['id'] === action.payload.chosenProductId
-                                                        )
+                                                        )[0]
                                                         :
-                                                        parsedProduct['products'],
+                                                        parsedProduct['product'],
                                                     resolved: index === action.payload.parsedProductIndex ? true : parsedProduct.resolved
                                                 }
                                             ))
+                                : responseItem['items']
+                        }
+
+                    ))
+                ]
+            };
+
+        case Actions.Types.CHOOSE_MEASURE:
+            console.log('Choosing amount! ');
+            console.log(action);
+            return {
+                items: [
+                    ...state.items.map(responseItem => (
+                        {
+                            ...responseItem,
+                            items: responseItem['actual'] ? responseItem['items'].map(
+                                (parsedProduct, index) => (
+                                    {
+                                        ...parsedProduct,
+                                        product:  index === action.payload.parsedProductIndex ?
+                                            {
+                                                ...parsedProduct.product,
+                                                measure: parsedProduct.product.measures.filter(measure => (
+                                                    measure.id === action.payload.chosenAmountId
+                                                ))[0]
+                                            }
+                                            :
+                                            parsedProduct.product
+                                    }
+                                ))
                                 : responseItem['items']
                         }
 

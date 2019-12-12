@@ -6,6 +6,7 @@ import SpanMessage from '../containers/SpanMessage'
 import MealInfo from '../containers/MealInfo'
 import messageTypes from '../modules/messageTypes'
 import UserInput from './UserInput'
+import MeasureClarificationMessage from "./MeasureClarificationMessage";
 
 
 const mapStateToProps = state => ({
@@ -50,6 +51,8 @@ class DisplayedMessages extends React.Component {
                     return <MealInfo message={message} main={main} key={index}/>;
                 case messageTypes.userInput:
                     return <UserInput message={message} key={index}/>;
+                case messageTypes.measureClarification:
+                    return <MeasureClarificationMessage message={message} main={main} key={index}/>;
                 default:
                     return null;
             }

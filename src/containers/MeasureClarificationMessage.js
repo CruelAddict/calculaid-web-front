@@ -1,7 +1,7 @@
 import React from 'react'
 import Actions from "../modules/actions";
 import connect from "react-redux/es/connect/connect";
-import ProductOption from "./ProductOption";
+import MeasureOption from "./MeasureOption";
 
 const mapStateToProps = state => ({
     responseMessages: state.responseMessages,
@@ -21,7 +21,7 @@ const mapDispatchToProps = dispatch => ({
 });
 
 
-class ProductClarificationMessage extends React.Component {
+class MeasureClarificationMessage extends React.Component {
 
     constructor() {
         super();
@@ -58,23 +58,25 @@ class ProductClarificationMessage extends React.Component {
 
     render() {
         let mainClass = this.props.main ? ' main' : '';
-        let productOptionsSets = this.toChunks([ ... this.props.message.rawResponse.products], 6);
+        let amountOptionsSets = this.toChunks([ ... this.props.responseMessages.items.filter(
+            responseMessage => responseMessage['actual']
+        )[0].items[this.props.message.vagueProductIndex].product.measures], 6);
         return <div className={mainClass}>
-            <span>Нам необходимо кое-что уточнить. Что конкретно вы съели?</span>
+            <span>Так а сколько?</span>
             <div className={'options-container'} >
-                {productOptionsSets.map( (productOptionsSet, index) => (
-                    productOptionsSet.map(
-                        product => (
-                            <div>
-                                <ProductOption
-                                    text={product.name}
-                                    key={product.id}
-                                    productId={product.id}
-                                    vagueProductIndex={this.props.message.vagueProductIndex}
-                                    main={this.props.main}
-                                    rawResponse={this.props.message.rawResponse}
-                                />
-                            </div>
+                {amountOptionsSets.map( (amountOptionSet, index) => (
+                        amountOptionSet.map(
+                            measure => (
+                                <div>
+                                    <MeasureOption
+                                        text={measure.name}
+                                        key={measure.id}
+                                        measureId={measure.id}
+                                        vagueProductIndex={this.props.message.vagueProductIndex}
+                                        grams={measure.grams}
+                                        main={this.props.main}
+                                    />
+                                </div>
                             )
                         )
                     )
@@ -85,4 +87,4 @@ class ProductClarificationMessage extends React.Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductClarificationMessage)
+export default connect(mapStateToProps, mapDispatchToProps)(MeasureClarificationMessage)

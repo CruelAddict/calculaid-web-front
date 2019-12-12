@@ -11,7 +11,10 @@ const Types = {
     DROP_FAILED_COUNT: "DROP_FAILED_COUNT",
     REPLAY_MESSAGE: "REPLAY_MESSAGE",
     VOICE_RECOGNITION_DISABLED: "VOICE_RECOGNITION_DISABLED",
-    VOICE_RECOGNITION_ENABLED: "VOICE_RECOGNITION_ENABLED"
+    VOICE_RECOGNITION_ENABLED: "VOICE_RECOGNITION_ENABLED",
+    RECOGNITION_FORCE_STOP: "RECOGNITION_FORCE_STOP",
+    RECOGNITION_FORCE_START: "RECOGNITION_FORCE_START",
+    CHOOSE_MEASURE: "CHOOSE_MEASURE"
 };
 
 const addResponse = response => dispatch => {
@@ -28,6 +31,17 @@ const chooseItem = (parsedProductIndex, chosenProductId) => dispatch => {
         payload: {
             parsedProductIndex,
             chosenProductId
+        }
+    });
+    return Promise.resolve()
+};
+
+const chooseMeasure = (parsedProductIndex, chosenAmountId) => dispatch => {
+    dispatch({
+        type: Types.CHOOSE_MEASURE,
+        payload: {
+            parsedProductIndex,
+            chosenAmountId
         }
     });
     return Promise.resolve()
@@ -109,9 +123,25 @@ const disableVoiceRecognition = () => dispatch => {
     return Promise.resolve()
 };
 
+const recognitionForceStart = () => dispatch => {
+    dispatch({
+        type: Types.RECOGNITION_FORCE_START
+    });
+    return Promise.resolve()
+};
+
+const recognitionForceStop = () => dispatch => {
+    dispatch({
+        type: Types.RECOGNITION_FORCE_STOP
+    });
+    return Promise.resolve()
+};
+
+
 export default {
     addResponse,
     chooseItem,
+    chooseMeasure,
     addDisplayedMessage,
     addQueuedMessage,
     releaseQueuedItem,
@@ -123,5 +153,7 @@ export default {
     replayMessage,
     enableVoiceRecognition,
     disableVoiceRecognition,
+    recognitionForceStart,
+    recognitionForceStop,
     Types
 }

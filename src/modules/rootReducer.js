@@ -8,5 +8,5 @@ export default combineReducers({
     responseMessages: responseReducer,
     displayedMessages: displayedMessagesReducer,
     failedItemsCount: failedItemsReducer,
-    recognizing: recognitionStatusReducer
+    voiceRecognition: recognitionStatusReducer
 })

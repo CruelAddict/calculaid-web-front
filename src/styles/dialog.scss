@@ -1,6 +1,7 @@
 body {
   margin: 0;
   //background-color: rgba(179, 255, 173, 0.16);
+  font-family: sans-serif;
 }
 
 .dialog-container {
@@ -88,11 +89,11 @@ body {
 
 .product-item-container {
   height: auto;
-  width: 47mm;
-  padding: 4px;
-  margin: 5px;
+  width: 60mm;
+  padding: 10px;
+  margin: 10px;
   border: 1px solid #969696;
-  border-radius: 20px;
+  border-radius: 10px;
   * {
     display: block;
   }
@@ -119,9 +120,9 @@ body {
 .options-container {
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   flex-wrap: wrap;
-
+  margin: 20px 0;
 }
 
 .main {

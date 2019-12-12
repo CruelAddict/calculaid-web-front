@@ -4,7 +4,9 @@ const types = {
     mealInfo: 'mealInfo',
     userInput: 'userInput',
     userProductClarification: 'userProductClarification',
-    userMealInfo: 'userMealInfo'
+    userMealInfo: 'userMealInfo',
+    measureClarification: 'measureClarification',
+    userMeasureClarification: 'userMeasureClarification'
 };
 
 export default types
